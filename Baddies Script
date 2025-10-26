@@ -1,1 +1,110 @@
+-- Simple UI Library
+local UILibrary = {}
 
+-- Default theme
+UILibrary.Theme = {
+    Primary = Color3.fromRGB(44, 120, 224),
+    Secondary = Color3.fromRGB(35, 35, 35),
+    Text = Color3.fromRGB(255, 255, 255),
+    Accent = Color3.fromRGB(0, 200, 100)
+}
+
+-- Create a new UI
+function UILibrary.new(name)
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = name or "UILibrary"
+    screenGui.ResetOnSpawn = false
+    
+    local main = {
+        ScreenGui = screenGui,
+        Elements = {}
+    }
+    
+    -- Create a new frame
+    function main:CreateFrame(name, size, position, parent)
+        local frame = Instance.new("Frame")
+        frame.Name = name or "Frame"
+        frame.Size = UDim2.new(0, size[1], 0, size[2])
+        frame.Position = UDim2.new(0, position[1], 0, position[2])
+        frame.BackgroundColor3 = UILibrary.Theme.Secondary
+        frame.BorderSizePixel = 0
+        
+        -- Add corner radius
+        local corner = Instance.new("UICorner", frame)
+        corner.CornerRadius = UDim.new(0, 8)
+        
+        -- Add shadow
+        local shadow = Instance.new("UIStroke", frame)
+        shadow.Color = Color3.new(0, 0, 0)
+        shadow.Transparency = 0.7
+        shadow.Thickness = 2
+        
+        frame.Parent = parent or screenGui
+        self.Elements[name] = frame
+        return frame
+    end
+    
+    -- Create a button
+    function main:CreateButton(name, size, position, parent, text)
+        local button = Instance.new("TextButton")
+        button.Name = name or "Button"
+        button.Size = UDim2.new(0, size[1], 0, size[2])
+        button.Position = UDim2.new(0, position[1], 0, position[2])
+        button.BackgroundColor3 = UILibrary.Theme.Primary
+        button.TextColor3 = UILibrary.Theme.Text
+        button.Text = text or "Button"
+        button.Font = Enum.Font.GothamBold
+        button.TextSize = 14
+        button.BorderSizePixel = 0
+        
+        -- Add corner radius
+        local corner = Instance.new("UICorner", button)
+        corner.CornerRadius = UDim.new(0, 6)
+        
+        -- Add hover effect
+        button.MouseEnter:Connect(function()
+            game:GetService("TweenService"):Create(button, TweenInfo.new(0.2), {BackgroundTransparency = 0.2}):Play()
+        end)
+        
+        button.MouseLeave:Connect(function()
+            game:GetService("TweenService"):Create(button, TweenInfo.new(0.2), {BackgroundTransparency = 0}):Play()
+        end)
+        
+        button.Parent = parent or screenGui
+        self.Elements[name] = button
+        return button
+    end
+    
+    -- Create a label
+    function main:CreateLabel(name, size, position, parent, text)
+        local label = Instance.new("TextLabel")
+        label.Name = name or "Label"
+        label.Size = UDim2.new(0, size[1], 0, size[2])
+        label.Position = UDim2.new(0, position[1], 0, position[2])
+        label.BackgroundTransparency = 1
+        label.TextColor3 = UILibrary.Theme.Text
+        label.Text = text or "Label"
+        label.Font = Enum.Font.Gotham
+        label.TextSize = 14
+        label.TextXAlignment = Enum.TextXAlignment.Left
+        
+        label.Parent = parent or screenGui
+        self.Elements[name] = label
+        return label
+    end
+    
+    -- Toggle visibility
+    function main:Toggle(visible)
+        self.ScreenGui.Enabled = visible
+    end
+    
+    -- Clean up
+    function main:Destroy()
+        self.ScreenGui:Destroy()
+        table.clear(self.Elements)
+    end
+    
+    return main
+end
+
+return UILibrary
